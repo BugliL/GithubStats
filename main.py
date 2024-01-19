@@ -1,45 +1,63 @@
+import json
 import os
 import logging
 import requests
 from datetime import datetime
-from pprint import pprint
 
 logging.basicConfig(level=logging.ERROR)
 
-today_date = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+today = datetime.utcnow().strftime("%Y-%m-%dT00:00:00Z")
+organization = os.environ.get("GITHUB_ORGANIZATION")
+repository = os.environ.get("GITHUB_REPOSITORY")
+token = os.environ.get("GITHUB_TOKEN")
+user = os.environ.get("GITHUB_USER")
 
 query = f"""
-query {{
-  viewer {{
-    pullRequests(
-        states: [OPEN, MERGED], 
-        first: 20, orderBy: {{field: CREATED_AT, direction: DESC}}
+query PRReviewers {{
+  organization(login: "{organization}") {{
+    repositories(
+      first: 10 
+      orderBy: {{field: UPDATED_AT, direction: DESC}}
     ) {{
       nodes {{
-        title
-        createdAt
-        author {{
-            login
-        }}
-      }}
-    }}
-    repositories(first: 10, orderBy: {{field: CREATED_AT, direction: DESC}}) {{
-      nodes {{
         name
-        createdAt
+        pullRequests(
+          first: 20
+          states: [OPEN, MERGED]
+          orderBy: {{field: CREATED_AT, direction: DESC}}
+        ) {{
+          edges {{
+            node {{
+              ... on PullRequest {{
+                title
+                createdAt
+                updatedAt
+                state
+                reviews(first: 20, author: "{user}") {{
+                  totalCount
+                  nodes {{
+                    state
+                    updatedAt
+                  }}
+                }}
+                author {{
+                  login
+                }}
+              }}
+            }}
+          }}
+        }}
       }}
     }}
   }}
 }}
-"""  # noqa: F541
+"""
 
-# Esegui la query GraphQL
-today_date = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-github_token = os.environ.get("GITHUB_TOKEN")
-headers = {"Authorization": f"bearer {github_token}"}
+# Execute the query
+headers = {"Authorization": f"bearer {token}"}
 url = "https://api.github.com/graphql"
 response = requests.post(url, json={"query": query}, headers=headers)
 data = response.json()
 
-# Stampa i risultati
-pprint(data, indent=2,compact=False, width=200)
+# Print results
+print(json.dumps(data, indent=2, sort_keys=True))

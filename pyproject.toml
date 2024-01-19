@@ -9,6 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 graphene = "^3.3"
+urllib3 = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core"]
