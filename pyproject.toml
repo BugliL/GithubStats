@@ -10,6 +10,7 @@ readme = "README.md"
 python = "^3.9"
 graphene = "^3.3"
 urllib3 = "^2.1.0"
+pandas = "^2.2.0"
 
 [build-system]
 requires = ["poetry-core"]
