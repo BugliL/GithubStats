@@ -5,7 +5,7 @@ import requests
 from datetime import datetime, timedelta
 import pandas as pd
 
-from .queries import reviews_query
+from queries import reviews_query
 
 logging.basicConfig(level=logging.ERROR)
 
