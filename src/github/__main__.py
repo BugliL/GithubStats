@@ -42,6 +42,9 @@ if __name__ == "__main__":
 
     # filtered by date and grouped by pull request
     reviewed = df[df["review_date"] > yesterday]
+    
+    # group data by pull request and get the last review_state
+    reviewed = reviewed.sort_values("review_date", ascending=False).groupby("number").head(1)
 
 
     def get_comment(action):
