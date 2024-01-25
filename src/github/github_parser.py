@@ -48,7 +48,7 @@ class GithubParser(object):
         # filtered by date and grouped by pull request
         yesterday = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
         reviewed = df[(df["review_date"] > yesterday) | (df["review_date"].isnull())]
-        reviewed = df[(df["assignee"] == USER) | (df["review_state"])]
+        reviewed = df[(df["assignee"] == USER) | (df["review_state"].notnull())]
 
         # group data by pull request and get the last review_state
         self.review_dataframe = reviewed.sort_values("review_date", ascending=False)
